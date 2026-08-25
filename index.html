@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Suite: Pemantauan & Kawalan Lesen E-Book Fizik 2026</title>
+  <meta name="description" content="Pusat kawalan dan pemantauan kod lesen e-book Shopee, had muat turun 2 kali, dan pengurusan stok pembeli.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="dashboard-container">
+    
+    <!-- Top Header -->
+    <header class="dashboard-header">
+      <div class="header-brand">
+        <div class="header-icon">📊</div>
+        <div>
+          <h1>Admin Suite: Pemantauan Kod Lesen E-Book</h1>
+          <p>Portal Kawalan Penggunaan, Reset Kuota & Salin Mesej Shopee Chat</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button id="quickAssignBtn" class="btn btn-success">
+          ⚡ Ambil 1 Kod Baru (Shopee)
+        </button>
+        <button id="openBulkModalBtn" class="btn btn-primary">
+          📦 Jana Kod Pukal
+        </button>
+        <button id="exportCsvBtn" class="btn btn-secondary">
+          💾 Eksport CSV
+        </button>
+        <button id="refreshBtn" class="btn btn-secondary" title="Segarkan Data Terkini dari Supabase">
+          🔄 Refresh
+        </button>
+      </div>
+    </header>
+
+    <!-- KPI Metric Cards -->
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon total">🏷️</div>
+        <div class="stat-info">
+          <div class="stat-value" id="statTotal">0</div>
+          <div class="stat-label">Jumlah Keseluruhan Lesen</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon available">🟢</div>
+        <div class="stat-info">
+          <div class="stat-value" id="statAvailable">0</div>
+          <div class="stat-label">Stok Belum Guna (2/2)</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon in-use">🟡</div>
+        <div class="stat-info">
+          <div class="stat-value" id="statInUse">0</div>
+          <div class="stat-label">Sedang Digunakan (1/2)</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon exhausted">🔴</div>
+        <div class="stat-info">
+          <div class="stat-value" id="statExhausted">0</div>
+          <div class="stat-label">Had Telah Habis (0/2)</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon downloads">📥</div>
+        <div class="stat-info">
+          <div class="stat-value" id="statTotalDownloads">0</div>
+          <div class="stat-label">Jumlah Muat Turun Terkumpul</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Assist Banner -->
+    <section class="quick-assist-card">
+      <div class="quick-assist-text">
+        <h3>🛍️ Bantuan Pantas Pesanan Shopee</h3>
+        <p>Gunakan butang <strong>"Ambil 1 Kod Baru (Shopee)"</strong> untuk mengambil kod belum guna seterusnya dan terus salin mesej lengkap berserta link ke Shopee Chat pembeli.</p>
+      </div>
+      <div>
+        <a href="https://kertas22026.vercel.app/" target="_blank" class="btn btn-secondary">
+          🌐 Buka Portal Pembeli (Vercel) ➔
+        </a>
+      </div>
+    </section>
+
+    <!-- Table Toolbar (Search & Filter) -->
+    <div class="table-toolbar">
+      <div class="search-input-wrapper">
+        <input type="text" id="searchInput" class="form-control" placeholder="🔍 Cari Kod Lesen, Order ID, atau Nama Pembeli...">
+      </div>
+
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <select id="statusFilter" class="form-control filter-select">
+          <option value="all">Semua Status</option>
+          <option value="available">🟢 Belum Guna (2/2)</option>
+          <option value="in_use">🟡 Sedang Guna (1/2)</option>
+          <option value="exhausted">🔴 Tamat Had (0/2)</option>
+          <option value="disabled">🚫 Dinyahaktifkan</option>
+        </select>
+
+        <select id="pageSizeSelect" class="form-control" style="max-width: 130px;">
+          <option value="25">25 / halaman</option>
+          <option value="50">50 / halaman</option>
+          <option value="100">100 / halaman</option>
+          <option value="500">Semua (500)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Main Data Table -->
+    <div class="table-card">
+      <div class="table-responsive">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th style="width: 40px;">#</th>
+              <th>Kod Lesen & Masa Muat Turun</th>
+              <th>Maklumat Pesanan</th>
+              <th>Status Had Muat Turun</th>
+              <th>Tarikh Cipta</th>
+              <th style="text-align: right; padding-right: 24px;">Tindakan Kawalan</th>
+            </tr>
+          </thead>
+          <tbody id="keysTableBody">
+            <!-- Rendered by app.js -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Table Footer with Pagination -->
+      <div class="table-footer">
+        <div id="tableCountInfo">Memuatkan data...</div>
+        <div id="paginationControls" class="pagination-buttons"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL: QUICK SHOPEE ASSIGN ASSISTANT                      -->
+  <!-- ========================================================= -->
+  <div id="quickAssignModal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>⚡ Ambil Kod Baru & Salin Mesej Shopee</h3>
+        <button class="modal-close" data-close-modal>&times;</button>
+      </div>
+      <form id="quickAssignForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Kod Lesen Tersedia (Sedia Digunakan):</label>
+            <input type="text" id="qaKeyCode" class="form-control" style="font-family: var(--font-mono); font-weight: 700; color: #34d399;" readonly>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Nombor Pesanan / Order ID Shopee (Pilihan):</label>
+            <input type="text" id="qaOrderId" class="form-control" placeholder="cth: 260825ABCD99">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Nama Pembeli Shopee (Pilihan):</label>
+            <input type="text" id="qaBuyerName" class="form-control" placeholder="cth: Amirul Hakim">
+          </div>
+
+          <div style="background: rgba(59, 130, 246, 0.1); border: 1px dashed rgba(59, 130, 246, 0.3); border-radius: var(--radius-md); padding: 12px; font-size: 0.8rem; color: #93c5fd;">
+            💡 Apabila anda menekan butang di bawah, maklumat pembeli akan disimpan ke Supabase dan templat mesej lengkap berserta link direct auto-tebus akan terus <strong>disalin ke clipboard</strong> untuk anda hantar ke Shopee Chat!
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" data-close-modal>Batal</button>
+          <button type="submit" class="btn btn-success btn-sm">📋 Simpan & Salin Mesej Shopee</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL: BULK GENERATOR                                     -->
+  <!-- ========================================================= -->
+  <div id="bulkModal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>📦 Jana Kod Lesen Pukal Tambahan</h3>
+        <button class="modal-close" data-close-modal>&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">
+          Tambah kod lesen baharu terus ke pangkalan data Supabase Cloud anda.
+        </p>
+
+        <div class="form-group">
+          <label class="form-label">Bilangan Kod yang Ingin Dijana:</label>
+          <input type="number" id="bulkCount" class="form-control" value="20" min="1" max="100">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Prefix Kunci:</label>
+          <input type="text" id="bulkPrefix" class="form-control" value="FZ26" maxlength="6">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-close-modal>Batal</button>
+        <button type="button" id="submitBulkBtn" class="btn btn-primary btn-sm">⚡ Jana & Simpan ke Cloud</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
