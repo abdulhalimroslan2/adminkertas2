@@ -123,8 +123,8 @@ class AdminPortalApp {
   // Kira KPI Statistik
   calculateStats() {
     const total = this.allKeys.length;
-    const available = this.allKeys.filter(k => k.downloads_left === 2 && k.status === 'active').length;
-    const inUse = this.allKeys.filter(k => k.downloads_left === 1 && k.status === 'active').length;
+    const available = this.allKeys.filter(k => k.downloads_left === 4 && k.status === 'active').length;
+    const inUse = this.allKeys.filter(k => k.downloads_left >= 1 && k.downloads_left <= 3 && k.status === 'active').length;
     const exhausted = this.allKeys.filter(k => k.downloads_left <= 0 || k.status === 'exhausted').length;
     const disabled = this.allKeys.filter(k => k.status === 'disabled').length;
     const totalDownloads = this.allKeys.reduce((acc, k) => acc + (k.download_count || 0), 0);
@@ -150,9 +150,9 @@ class AdminPortalApp {
 
     // Status Filter
     if (filterVal === "available") {
-      result = result.filter(k => k.downloads_left === 2 && k.status === 'active');
+      result = result.filter(k => k.downloads_left === 4 && k.status === 'active');
     } else if (filterVal === "in_use") {
-      result = result.filter(k => k.downloads_left === 1 && k.status === 'active');
+      result = result.filter(k => k.downloads_left >= 1 && k.downloads_left <= 3 && k.status === 'active');
     } else if (filterVal === "exhausted") {
       result = result.filter(k => k.downloads_left <= 0 || k.status === 'exhausted');
     } else if (filterVal === "disabled") {
@@ -320,7 +320,7 @@ Berikut adalah pautan & Kod Lesen untuk memuat turun E-Book Fizik Percubaan SPM 
 2. Skema & Panduan Jawapan Lengkap + Tip Skor A+ (PDF HD)
 
 ⚠️ PENTING:
-- Kod lesen ini terhad kepada 2 KALI MUAT TURUN sahaja bagi memelihara hak cipta modul.
+- Kod lesen ini diberikan 4 KALI MUAT TURUN (cth: 2x Versi Soalan + 2x Versi Skema) bagi kemudahan anda.
 - Sila terus simpan fail PDF ke peranti anda (Google Drive / Files / Storan Peranti) setelah selesai muat turun.
 
 Selamat mengulang kaji dan semoga beroleh keputusan A+ Cemerlang dalam SPM Fizik 2026! 🎯`;
@@ -351,20 +351,20 @@ Selamat mengulang kaji dan semoga beroleh keputusan A+ Cemerlang dalam SPM Fizik
     }
   }
 
-  // 4. Reset Penuh ke 2 Kuota
+  // 4. Reset Penuh ke 4 Kuota
   async resetKey(key) {
-    if (!confirm(`Reset kuota kod ${key} kembali kepada 2 kali muat turun?`)) return;
+    if (!confirm(`Reset kuota kod ${key} kembali kepada 4 kali muat turun?`)) return;
     if (!this.supabase) return;
 
     try {
       const { error } = await this.supabase
         .from("license_keys")
-        .update({ downloads_left: 2, download_count: 0, status: "active" })
+        .update({ downloads_left: 4, download_count: 0, status: "active" })
         .eq("key", key);
 
       if (error) throw error;
 
-      this.showToast(`Kod ${key} berjaya di-reset penuh (2/2)!`, "success");
+      this.showToast(`Kod ${key} berjaya di-reset penuh (4/4)!`, "success");
       await this.fetchKeysFromCloud();
     } catch (e) {
       this.showToast(`Ralat reset: ${e.message}`, "error");
@@ -416,7 +416,7 @@ Selamat mengulang kaji dan semoga beroleh keputusan A+ Cemerlang dalam SPM Fizik
   // QUICK SHOPEE ASSIGN ASSISTANT (Ambil 1 Kod Baru)
   // ==========================================================
   openQuickAssignModal() {
-    const availableKey = this.allKeys.find(k => k.downloads_left === 2 && k.status === 'active');
+    const availableKey = this.allKeys.find(k => k.downloads_left === 4 && k.status === 'active') || this.allKeys.find(k => k.downloads_left > 0 && k.status === 'active');
     if (!availableKey) {
       this.showToast("Tiada stok kod belum guna. Sila jana kod tambahan.", "error");
       return;
@@ -486,8 +486,8 @@ Selamat mengulang kaji dan semoga beroleh keputusan A+ Cemerlang dalam SPM Fizik
         key: generatedKey,
         order_id: `Stok Tambahan`,
         customer_name: `Stok Shopee`,
-        downloads_left: 2,
-        max_downloads: 2,
+        downloads_left: 4,
+        max_downloads: 4,
         download_count: 0,
         status: 'active'
       });
