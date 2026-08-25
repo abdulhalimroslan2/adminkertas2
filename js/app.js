@@ -10,14 +10,69 @@ class AdminPortalApp {
     this.filteredKeys = [];
     this.currentPage = 1;
     this.pageSize = 25;
-    this.isAuthenticated = true; // Auto-active via PIN or preloaded
+    this.isAuthenticated = false;
     this.init();
   }
 
   async init() {
     this.initSupabase();
     this.bindEvents();
-    await this.fetchKeysFromCloud();
+    this.checkAuth();
+  }
+
+  checkAuth() {
+    const savedAuth = sessionStorage.getItem("admin_auth_kertas2");
+    const requiredPassword = ADMIN_CONFIG.adminPassword || "@reeZ860";
+
+    const loginScreen = document.getElementById("loginScreen");
+    const dashboardContent = document.getElementById("dashboardContent");
+    const passwordInput = document.getElementById("adminPasswordInput");
+
+    if (savedAuth === requiredPassword) {
+      this.isAuthenticated = true;
+      if (loginScreen) loginScreen.style.display = "none";
+      if (dashboardContent) dashboardContent.style.display = "block";
+      this.fetchKeysFromCloud();
+    } else {
+      this.isAuthenticated = false;
+      if (loginScreen) loginScreen.style.display = "flex";
+      if (dashboardContent) dashboardContent.style.display = "none";
+      if (passwordInput) {
+        passwordInput.value = "";
+        setTimeout(() => passwordInput.focus(), 150);
+      }
+    }
+  }
+
+  handleLogin(e) {
+    e.preventDefault();
+    const passwordInput = document.getElementById("adminPasswordInput");
+    const errorMsg = document.getElementById("loginErrorMsg");
+    const enteredPassword = passwordInput ? passwordInput.value.trim() : "";
+    const requiredPassword = ADMIN_CONFIG.adminPassword || "@reeZ860";
+
+    if (enteredPassword === requiredPassword) {
+      sessionStorage.setItem("admin_auth_kertas2", requiredPassword);
+      if (errorMsg) errorMsg.style.display = "none";
+      this.checkAuth();
+      this.showToast("Log masuk keselamatan admin berjaya!", "success");
+    } else {
+      if (errorMsg) {
+        errorMsg.innerText = "Kata laluan salah. Sila cuba lagi.";
+        errorMsg.style.display = "block";
+      }
+      if (passwordInput) {
+        passwordInput.value = "";
+        passwordInput.focus();
+      }
+    }
+  }
+
+  handleLogout() {
+    if (confirm("Adakah anda pasti ingin log keluar dari panel admin?")) {
+      sessionStorage.removeItem("admin_auth_kertas2");
+      window.location.reload();
+    }
   }
 
   initSupabase() {
@@ -35,6 +90,17 @@ class AdminPortalApp {
   }
 
   bindEvents() {
+    // Form Login
+    const loginForm = document.getElementById("adminLoginForm");
+    if (loginForm) {
+      loginForm.addEventListener("submit", (e) => this.handleLogin(e));
+    }
+
+    // Logout Button
+    const logoutBtn = document.getElementById("logoutBtn");
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", () => this.handleLogout());
+    }
     // Carian & Penapis
     const searchInput = document.getElementById("searchInput");
     const statusFilter = document.getElementById("statusFilter");

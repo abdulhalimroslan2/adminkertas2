@@ -3,7 +3,7 @@
  */
 
 const ADMIN_CONFIG = {
-  adminPin: "1234",
+  adminPassword: "@reeZ860", // Kata Laluan Keselamatan Admin
   portalUrl: "https://kertas22026.vercel.app/",
   
   // Supabase Cloud Connection (Pre-configured)

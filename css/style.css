@@ -47,6 +47,82 @@ body {
   background-attachment: fixed;
 }
 
+/* Login Security Screen */
+.login-screen-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(9, 13, 22, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.login-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-xl);
+  padding: 36px 30px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.login-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin: 0 auto 14px;
+}
+
+.login-header h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.login-header p {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.login-error-alert {
+  background: rgba(244, 63, 94, 0.15);
+  border: 1px solid rgba(244, 63, 94, 0.35);
+  color: #fca5a5;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  margin-top: 10px;
+  animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
 .dashboard-container {
   max-width: 1240px;
   margin: 0 auto;
@@ -461,20 +537,6 @@ body {
   font-weight: 600;
   color: var(--text-muted);
   margin-bottom: 6px;
-}
-
-.shopee-copy-box {
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid var(--border-card);
-  border-radius: var(--radius-md);
-  padding: 12px;
-  font-family: inherit;
-  font-size: 0.8rem;
-  color: #e2e8f0;
-  height: 140px;
-  width: 100%;
-  resize: vertical;
-  margin-bottom: 12px;
 }
 
 /* Toast */

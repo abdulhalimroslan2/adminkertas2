@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Suite: Pemantauan & Kawalan Lesen E-Book Fizik 2026</title>
-  <meta name="description" content="Pusat kawalan dan pemantauan kod lesen e-book Shopee, had muat turun 2 kali, dan pengurusan stok pembeli.">
+  <meta name="description" content="Pusat kawalan dan pemantauan kod lesen e-book Shopee, had muat turun 4 kali, dan pengurusan stok pembeli.">
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,7 +19,42 @@
 </head>
 <body>
 
-  <div class="dashboard-container">
+  <!-- ========================================================= -->
+  <!-- SECURITY LOGIN GATE (Kata Laluan Keselamatan)             -->
+  <!-- ========================================================= -->
+  <div id="loginScreen" class="login-screen-overlay">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-icon">🔒</div>
+        <h2>Akses Keselamatan Admin</h2>
+        <p>Sila masukkan kata laluan untuk membuka dashboard pemantauan lesen Shopee.</p>
+      </div>
+
+      <form id="adminLoginForm">
+        <div class="form-group">
+          <label class="form-label">Kata Laluan Admin:</label>
+          <input 
+            type="password" 
+            id="adminPasswordInput" 
+            class="form-control" 
+            placeholder="Masukkan kata laluan" 
+            autocomplete="current-password"
+            required>
+        </div>
+
+        <div id="loginErrorMsg" class="login-error-alert" style="display: none;"></div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 14px; padding: 12px;">
+          🔓 Log Masuk Admin
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MAIN DASHBOARD CONTENT (Tersembunyi sebelum login)        -->
+  <!-- ========================================================= -->
+  <div id="dashboardContent" class="dashboard-container" style="display: none;">
     
     <!-- Top Header -->
     <header class="dashboard-header">
@@ -43,6 +78,9 @@
         </button>
         <button id="refreshBtn" class="btn btn-secondary" title="Segarkan Data Terkini dari Supabase">
           🔄 Refresh
+        </button>
+        <button id="logoutBtn" class="btn btn-danger" title="Log Keluar dari Admin Suite">
+          🚪 Keluar
         </button>
       </div>
     </header>
